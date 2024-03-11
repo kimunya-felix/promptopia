@@ -5,9 +5,10 @@ import { signIn,signOut, useSession, getProviders } from "next-auth/react"
 import { useState, useEffect } from "react"
 
 const Nav = () => {
-    const isUserLoggedIn = false;
+    const isUserLoggedIn = true;
 
     const [providers, setProviders] = useState(null);
+    const [toggleDropdown, setToggleDropdown] = useState(false);
 
     useEffect(() => {
         const setProviders = async () => {
@@ -44,9 +45,61 @@ const Nav = () => {
                 </Link>
             </div>) 
             :
-            (<></>)}
+            (<>
+                {providers && Object.values(providers).map(provider => (
+                    <button key={provider.name} className="black_btn" onClick={() => signIn(provider.id)}>
+                        Sign in
+                    </button>
+                ))}
+            </>)
+            }
         </div>
-      
+        <div className="flex sm:hidden relative">
+            {isUserLoggedIn ? (
+            <div className="flex">
+                <Image 
+                src="/assets/images/logo.svg" 
+                alt="Promptopia logo"
+                width={30}
+                height={30}
+                className="object-contain"
+                onClick={()=> {setToggleDropdown(prev => !prev)}}/>
+
+                {toggleDropdown && 
+                (
+                    <div className="dropdown">
+                        <Link className="dropdown_link"
+                        href='/profile'
+                        onClick={()=>setToggleDropdown(false)}>
+                            My Profile
+                        </Link>
+
+                        <Link className="dropdown_link"
+                        href='/creat-prompt'
+                        onClick={()=>setToggleDropdown(false)}>
+                            Create Prompt
+                        </Link>
+
+                        <button className="mt-5 w-full black_btn"
+                        type="button"
+                        onClick={()=>{setToggleDropdown(false);
+                        signOut()}}>
+                            Sign Out
+                        </button>
+                    </div>
+                )}
+            </div>
+            ) : (
+            <>
+                {providers && Object.values(providers).map(provider => (
+                    <button key={provider.name} className="black_btn" onClick={() => signIn(provider.id)}>
+                        Sign in
+                    </button>
+                )
+            )}
+            </>
+        )}
+        </div>
     </nav>
   )
 }
